@@ -5,18 +5,26 @@
     xmlns:local="using:NetworkStats"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d"
+    xmlns:Charting="using:WinRTXamlToolkit.Controls.DataVisualization.Charting">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel Margin="10,0,0,28">
-            <TextBlock x:Name="ApplicationTitle" Text="Network Stats" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock x:Name="ApplicationTitle" Text="Network Stats"/>
         </StackPanel>
         <Pivot x:Name="Tabs" Margin="7,19,13,1">
-            <PivotItem Header="Network Usage">
-                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
-                    <Button x:Name="WLan">Wireless Lan</Button>
-                    <Button x:Name="Cellular">Mobile Data</Button>
+            <PivotItem Header="Network Usage" Margin="12,0">
+                <StackPanel VerticalAlignment="Bottom" Margin="10,10,10,10">
+                    <Charting:Chart x:Name="UsageChart" IsTapEnabled="False" VerticalAlignment="Top">
+                        
+                    </Charting:Chart>
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                        <Button MinWidth="90" Margin="10" BorderBrush="Black" BorderThickness="1.5" x:Name="WLan">Wireless Lan</Button>
+                        <Button MinWidth="90" Margin="10" BorderBrush="Black" BorderThickness="1.5" x:Name="Cellular">Mobile Data</Button>
+                    </StackPanel>
+                    <TextBlock HorizontalAlignment="Center" Text="Copyright G00328337" FontSize="10"/>
                 </StackPanel>
+                
             </PivotItem>
             <PivotItem Header="Wifi IP Manager">
 
