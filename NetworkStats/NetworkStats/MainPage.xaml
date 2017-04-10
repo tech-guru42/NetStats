@@ -1,0 +1,27 @@
+﻿<Page
+    x:Class="NetworkStats.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NetworkStats"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Margin="10,0,0,28">
+            <TextBlock x:Name="ApplicationTitle" Text="Network Stats" Style="{StaticResource PhoneTextNormalStyle}"/>
+        </StackPanel>
+        <Pivot x:Name="Tabs" Margin="7,19,13,1">
+            <PivotItem Header="Network Usage">
+                <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <Button x:Name="WLan">Wireless Lan</Button>
+                    <Button x:Name="Cellular">Mobile Data</Button>
+                </StackPanel>
+            </PivotItem>
+            <PivotItem Header="Wifi IP Manager">
+
+            </PivotItem>
+        </Pivot>
+
+    </Grid>
+</Page>
