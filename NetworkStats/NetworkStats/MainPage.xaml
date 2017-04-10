@@ -15,6 +15,9 @@
         <Pivot x:Name="Tabs" Margin="7,19,13,1">
             <PivotItem Header="Network Usage" Margin="12,0">
                 <StackPanel VerticalAlignment="Bottom" Margin="10,10,10,10">
+                    <ListBox x:Name="ConnectionsList"/>
+                    <TextBlock x:Name="Download" Text="0 kb"/>
+                    <TextBlock x:Name="Upload" Text="0 kb"/>
                     <Charting:Chart x:Name="UsageChart" IsTapEnabled="False" VerticalAlignment="Top">
                         
                     </Charting:Chart>
