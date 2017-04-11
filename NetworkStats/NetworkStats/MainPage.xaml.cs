@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using WinRTXamlToolkit.Controls.DataVisualization.Charting;
 
 // The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
@@ -23,23 +24,17 @@ namespace NetworkStats
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public static class BytesConvertor
+    public class Records
     {
-        public enum SizeUnits
-        {
-            Byte, KB, MB, GB, TB, PB, EB, ZB, YB
-        }
-
-        public static string ToSize(this Int64 value, SizeUnits unit)
-        {
-            return (value / (double)Math.Pow(1024, (Int64)unit)).ToString("0.00");
-        }
+        public string Name {get; set;}
+        public int Amount {get; set;}
     }
     public sealed partial class MainPage : Page
     {
-        public MainPage()
+    public MainPage()
         {
             this.InitializeComponent();
+            LoadChartContents();
         }
 
         public async void GetUsage(List<DateTime> period)
@@ -89,6 +84,50 @@ namespace NetworkStats
             period.Add(startTime);
             period.Add(currTime);
             GetUsage(period);
+        }
+
+        private void LoadChartContents()
+        {
+            Random rand = new Random();
+            List<Records> records = new List<Records>();
+            records.Add(new Records()
+            {
+                Name = "1", Amount = 100
+            });
+            records.Add(new Records()
+            {
+                Name = "2", Amount = 200
+            });
+            records.Add(new Records()
+            {
+                Name = "3", Amount = 300
+            });
+            records.Add(new Records()
+            {
+                Name = "4", Amount = 25
+            });
+            records.Add(new Records()
+            {
+                Name = "4",
+                Amount = 25
+            });
+            records.Add(new Records()
+            {
+                Name = "5",
+                Amount = 25
+            });
+            records.Add(new Records()
+            {
+                Name = "6",
+                Amount = 25
+            });
+            records.Add(new Records()
+            {
+                Name = "7",
+                Amount = 25
+            });
+            (ColumnChart.Series[0] as AreaSeries).ItemsSource = records;
+            
         }
     }
 }

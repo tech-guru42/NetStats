@@ -2,7 +2,6 @@
     x:Class="NetworkStats.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:NetworkStats"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -12,13 +11,15 @@
         <StackPanel Margin="10,0,0,28">
             <TextBlock x:Name="ApplicationTitle" Text="Network Stats"/>
         </StackPanel>
-        <Pivot x:Name="Tabs" Margin="-2,10,0,10">
+        <Pivot x:Name="Tabs" Margin="0,10,0,10">
             <PivotItem Header="Network Usage" Margin="12,0">
                 <StackPanel VerticalAlignment="Bottom">
-                    <StackPanel VerticalAlignment="Top">
-                        <TextBlock Text="Disclaimer"/>
-                    </StackPanel>
                     <StackPanel VerticalAlignment="Bottom" Margin="10,10,10,10">
+                        <StackPanel>
+                            <Charting:Chart x:Name="ColumnChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="350">
+                                <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="Amount" Title="Usage" IsSelectionEnabled="False"/>
+                            </Charting:Chart>
+                        </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                             <TextBlock Text="Total Download for this period: "/>
                             <TextBlock x:Name="Download" Text="0 kb" Margin="5,0,0,0"/>
