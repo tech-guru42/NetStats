@@ -40,33 +40,55 @@ namespace NetworkStats
         public MainPage()
         {
             this.InitializeComponent();
-            TestProcAsync();
         }
 
-        public async void TestProcAsync()
+        public async void GetUsage(List<DateTime> period)
+        {
+            DateTime startTime = period[0];
+            DateTime endTime = period[1];
+            //Get the ConnectionProfile that is currently used to connect to the Internet
+            var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
+            var localUsage = await connectionProfile.GetNetworkUsageAsync(startTime, endTime, DataUsageGranularity.Total, new NetworkUsageStates());
+            var usage = localUsage[0];
+            //Converts and formats the output string according to size B,KB,MB,GB using ByteSize Library
+            var download = ByteSize.FromBytes(usage.BytesReceived);
+            Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
+            var upload = ByteSize.FromBytes(usage.BytesSent);
+            Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
+        }
+
+        private void day_Click(object sender, RoutedEventArgs e)
         {
             //Set end Time to now
             var currTime = DateTime.Now;
-
-            //Set start Time to 1 hour before current time
+            //Set start Time to 24 hours before current time
             var startTime = currTime - TimeSpan.FromHours(24);
-            var startOfMonth = new DateTime(currTime.Year, currTime.Month, 1);
-
-            //Get the ConnectionProfile that is currently used to connect to the Internet
-            var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-            var localUsage = await connectionProfile.GetNetworkUsageAsync(startOfMonth, currTime, DataUsageGranularity.Total, new NetworkUsageStates());
-
-            
-                var usage = localUsage[0];
-                var download = ByteSize.FromBytes(usage.BytesReceived);
-                Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
-                var upload = ByteSize.FromBytes(usage.BytesSent);
-                Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
-                /*Debug.WriteLine("Local Data Usage: \n\r"
-                    + "Bytes Sent: " + usage.BytesSent + "\n\r"
-                    + "Bytes Received: " + usage.BytesReceived + "\n\r");*/
-            
+            List<DateTime> period = new List<DateTime>();
+            period.Add(startTime);
+            period.Add(currTime);
+            GetUsage(period);
         }
 
+        private void week_Click(object sender, RoutedEventArgs e)
+        {
+            var currTime = DateTime.Now;
+            //Set start Time to 7 Days before current time
+            var startTime = currTime - TimeSpan.FromDays(7);
+            List<DateTime> period = new List<DateTime>();
+            period.Add(startTime);
+            period.Add(currTime);
+            GetUsage(period);
+        }
+
+        private void month_Click(object sender, RoutedEventArgs e)
+        {
+            var currTime = DateTime.Now;
+            //Set start Time to 1st of actual month
+            var startTime = new DateTime(currTime.Year, currTime.Month, 1);
+            List<DateTime> period = new List<DateTime>();
+            period.Add(startTime);
+            period.Add(currTime);
+            GetUsage(period);
+        }
     }
 }

@@ -12,21 +12,31 @@
         <StackPanel Margin="10,0,0,28">
             <TextBlock x:Name="ApplicationTitle" Text="Network Stats"/>
         </StackPanel>
-        <Pivot x:Name="Tabs" Margin="7,19,13,1">
+        <Pivot x:Name="Tabs" Margin="-2,10,0,10">
             <PivotItem Header="Network Usage" Margin="12,0">
-                <StackPanel VerticalAlignment="Bottom" Margin="10,10,10,10">
-                    <ListBox x:Name="ConnectionsList"/>
-                    <TextBlock x:Name="Download" Text="0 kb"/>
-                    <TextBlock x:Name="Upload" Text="0 kb"/>
-                    <Charting:Chart x:Name="UsageChart" IsTapEnabled="False" VerticalAlignment="Top">
-                        
-                    </Charting:Chart>
-                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                        <Button MinWidth="90" Margin="10" BorderBrush="Black" BorderThickness="1.5" x:Name="WLan">Wireless Lan</Button>
-                        <Button MinWidth="90" Margin="10" BorderBrush="Black" BorderThickness="1.5" x:Name="Cellular">Mobile Data</Button>
+                <StackPanel VerticalAlignment="Bottom">
+                    <StackPanel VerticalAlignment="Top">
+                        <TextBlock Text="Disclaimer"/>
                     </StackPanel>
-                    <TextBlock HorizontalAlignment="Center" Text="Copyright G00328337" FontSize="10"/>
+                    <StackPanel VerticalAlignment="Bottom" Margin="10,10,10,10">
+                        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                            <TextBlock Text="Total Download for this period: "/>
+                            <TextBlock x:Name="Download" Text="0 kb" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                            <TextBlock Text="Total Upload for this Period: "/>
+                            <TextBlock x:Name="Upload" Text="0 kb" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                            <Button MinWidth="90" Margin="5" BorderBrush="Black" BorderThickness="1.5" x:Name="day" Click="day_Click">Last 24h</Button>
+                            <Button MinWidth="90" Margin="5" BorderBrush="Black" BorderThickness="1.5" x:Name="week" Click="week_Click">Last 7 days</Button>
+                            <Button MinWidth="90" Margin="5" BorderBrush="Black" BorderThickness="1.5" x:Name="month" Click="month_Click">This month</Button>
+                        </StackPanel>
+                        <TextBlock Text="Usage is Displayed for active connection only" HorizontalAlignment="Center" FontStyle="Italic"/>
+                        <TextBlock HorizontalAlignment="Center" Text="Copyright G00328337" FontSize="10"/>
+                    </StackPanel>
                 </StackPanel>
+                
                 
             </PivotItem>
             <PivotItem Header="Wifi IP Manager">
