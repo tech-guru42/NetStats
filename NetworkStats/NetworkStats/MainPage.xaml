@@ -16,8 +16,11 @@
                 <StackPanel VerticalAlignment="Bottom">
                     <StackPanel VerticalAlignment="Bottom" Margin="10,10,10,10">
                         <StackPanel>
-                            <Charting:Chart x:Name="ColumnChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="350">
-                                <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="Amount" Title="Usage" IsSelectionEnabled="False"/>
+                            <Charting:Chart x:Name="DownloadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="350">
+                                <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="download" Title="Download Usage" IsSelectionEnabled="False"/>
+                            </Charting:Chart>
+                            <Charting:Chart x:Name="UploadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="350">
+                                <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="upload" Title="Upload Usage" IsSelectionEnabled="False"/>
                             </Charting:Chart>
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">

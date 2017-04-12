@@ -25,33 +25,37 @@ namespace NetworkStats
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public class Records
+    public class Downloads
     {
         public string Name {get; set;}
-        public int Amount {get; set;}
+        public int download {get; set;}
+    }
+
+    public class Uploads
+    {
+        public string Name { get; set; }
+        public int upload { get; set; }
     }
     public sealed partial class MainPage : Page
     {
-        List<Records> records = new List<Records>();
+        List<Downloads> downloads = new List<Downloads>();
+        List<Uploads> uploads = new List<Uploads>();
         List<ulong> data = new List<ulong>();
         public MainPage()
         {
             this.InitializeComponent();
             //dayChart();
-            LoadChartContents();
+            //LoadChartContents();
         }
 
-        public List<ulong> GetUsage(List<DateTime> period)
+        public List<ulong> GetUsage(DateTime start, DateTime end)
         {
-            DateTime startTime = period[0];
-            DateTime endTime = period[1];
             List<ulong> usageBytes = new List<ulong>();
             //Get the ConnectionProfile that is currently used to connect to the Internet
             var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-            var localUsage = connectionProfile.GetNetworkUsageAsync(startTime, endTime, DataUsageGranularity.Total, new NetworkUsageStates());
+            var localUsage = connectionProfile.GetNetworkUsageAsync(start, end, DataUsageGranularity.Total, new NetworkUsageStates());
             var temp = localUsage.GetAwaiter();
             var usage = temp.GetResult().ElementAt(0);
-            //Converts and formats the output string according to size B,KB,MB,GB using ByteSize Library
             usageBytes.Add(usage.BytesReceived);
             usageBytes.Add(usage.BytesSent);
             return usageBytes;
@@ -63,15 +67,12 @@ namespace NetworkStats
             var currTime = DateTime.Now;
             //Set start Time to 24 hours before current time
             var startTime = currTime - TimeSpan.FromHours(24);
-            List<DateTime> period = new List<DateTime>();
-            period.Add(startTime);
-            period.Add(currTime);
-            List<ulong> usageData =  GetUsage(period);
+            List<ulong> usageData =  GetUsage(startTime, currTime);
             var download = ByteSize.FromBytes(usageData[0]);
             Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
-            var upload = ByteSize.FromBytes(usageData[0]);
+            var upload = ByteSize.FromBytes(usageData[1]);
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
-
+            dayChart();
         }
 
         private void week_Click(object sender, RoutedEventArgs e)
@@ -79,10 +80,39 @@ namespace NetworkStats
             var currTime = DateTime.Now;
             //Set start Time to 7 Days before current time
             var startTime = currTime - TimeSpan.FromDays(7);
+            GetUsage(startTime, currTime);
+            List<ulong> usageData = GetUsage(startTime, currTime);
+            var download = ByteSize.FromBytes(usageData[0]);
+            Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
+            var upload = ByteSize.FromBytes(usageData[0]);
+            Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
+            #region
+            downloads.Clear();
+            uploads.Clear();
             List<DateTime> period = new List<DateTime>();
-            period.Add(startTime);
-            period.Add(currTime);
-            GetUsage(period);
+            for (int day = 0; day < 7; day++)
+            {
+                period.Clear();
+                period.Add(DateTime.Now.AddDays(-7 + day));
+                period.Add(DateTime.Now.AddDays(-6 + day));
+                List<ulong> data = GetUsage(period[0], period[1]);
+
+                downloads.Add(new Downloads()
+                {
+                    Name = period[0].DayOfWeek.ToString(),
+                    download = unchecked((int)data[0] / 1024),
+                });
+                uploads.Add(new Uploads()
+                {
+                    Name = period[0].DayOfWeek.ToString(),
+                    upload = unchecked((int)data[1] / 1024)
+                });
+            }
+            (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
+            (DownloadChart.Series[0] as AreaSeries).ItemsSource = downloads;
+            (UploadChart.Series[0] as AreaSeries).ItemsSource = null;
+            (UploadChart.Series[0] as AreaSeries).ItemsSource = uploads;
+            #endregion
         }
 
         private void month_Click(object sender, RoutedEventArgs e)
@@ -90,104 +120,43 @@ namespace NetworkStats
             var currTime = DateTime.Now;
             //Set start Time to 1st of actual month
             var startTime = new DateTime(currTime.Year, currTime.Month, 1);
-            List<DateTime> period = new List<DateTime>();
-            period.Add(startTime);
-            period.Add(currTime);
-            GetUsage(period);
+            GetUsage(startTime, currTime);
+            List<ulong> usageData = GetUsage(startTime, currTime);
+            var download = ByteSize.FromBytes(usageData[0]);
+            Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
+            var upload = ByteSize.FromBytes(usageData[1]);
+            Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
         }
 
         private void dayChart()
         {
             var currTime = DateTime.Now;
-            records.Clear();
+            downloads.Clear();
+            uploads.Clear();
             List<DateTime> period = new List<DateTime>();
-            //Task<List<String>> res = await GetPeriodUsage(period);
-            for (int hour = currTime.Hour - 24; hour < currTime.Hour; hour++)
+
+            for (int hour = 0; hour < 24; hour++)
             {
                 period.Clear();
-                period.Add(DateTime.Now - TimeSpan.FromHours(24 - hour));
-                period.Add(DateTime.Now - TimeSpan.FromHours(24 - hour + 1));
-                List<ulong> data = GetPeriodUsage(period);
+                period.Add(DateTime.Now.AddDays(-1).AddHours(hour));
+                period.Add(DateTime.Now.AddDays(-1).AddHours(hour+1));
+                List<ulong> data = GetUsage(period[0],period[1]);
 
-                records.Add(new Records()
+                downloads.Add(new Downloads()
                 {
                     Name = period[0].Hour.ToString(),
-
-                    Amount = unchecked((int)data[0] / 1024)
-                }
-                    );
+                    download = unchecked((int)data[0] / 1024),
+                });
+                uploads.Add(new Uploads()
+                {
+                    Name = period[0].Hour.ToString(),
+                    upload = unchecked((int)data[0] / 1024)
+                });
             }
-        }
-
-        public async Task<IReadOnlyList<NetworkUsage>> GetPerUsage(List<DateTime> period)
-        {
-            DateTime startTime = period[0];
-            DateTime endTime = period[1];
-            
-            //Get the ConnectionProfile that is currently used to connect to the Internet
-            var connectionProfile = NetworkInformation.GetInternetConnectionProfile();
-            var localUsage = await connectionProfile.GetNetworkUsageAsync(startTime, endTime, DataUsageGranularity.Total, new NetworkUsageStates());
-            /* var temp = localUsage.Result.GetResults();
-             NetworkUsage usage = temp.ElementAt(0);
-
-             */
-            int i = 0;
-            i++;
-            return localUsage;
-        }
-
-        public List<ulong> GetPeriodUsage (List<DateTime> period)
-        {
-            List<DateTime> thePeriod = period;
-            List<ulong> usageData = new List<ulong>();
-            //List<ulong> usage = new List<ulong>();
-            var usage = Task.Run(() => GetPerUsage(thePeriod)).Result;
-            /*usageData.Add(usage.ElementAt(0).BytesReceived);
-            usageData.Add(usage.ElementAt(0).BytesSent);*/
-            return usageData;
-        }
-
-
-        private void LoadChartContents()
-        {
-            records.Add(new Records()
-            {
-                Name = "1", Amount = 100
-            });
-            records.Add(new Records()
-            {
-                Name = "2", Amount = 200
-            });
-            records.Add(new Records()
-            {
-                Name = "3", Amount = 300
-            });
-            records.Add(new Records()
-            {
-                Name = "4", Amount = 25
-            });
-            records.Add(new Records()
-            {
-                Name = "4",
-                Amount = 25
-            });
-            records.Add(new Records()
-            {
-                Name = "5",
-                Amount = 25
-            });
-            records.Add(new Records()
-            {
-                Name = "6",
-                Amount = 25
-            });
-            records.Add(new Records()
-            {
-                Name = "7",
-                Amount = 25
-            });
-            (ColumnChart.Series[0] as AreaSeries).ItemsSource = records;
-            
+            (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
+            (DownloadChart.Series[0] as AreaSeries).ItemsSource = downloads;
+            (UploadChart.Series[0] as AreaSeries).ItemsSource = null;
+            (UploadChart.Series[0] as AreaSeries).ItemsSource = uploads;
         }
     }
 }
