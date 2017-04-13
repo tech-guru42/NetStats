@@ -16,8 +16,8 @@
                 <StackPanel VerticalAlignment="Bottom">
                     <StackPanel VerticalAlignment="Top" Margin="10,10,10,10" HorizontalAlignment="Left">
                         <StackPanel>
-                            <TextBox x:Name="AboutBox" Visibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Visible">
-                            </TextBox>
+                            <TextBlock x:Name="AboutBox" Visibility="Visible" ScrollViewer.VerticalScrollBarVisibility="Disabled" Height="300" Width="300" HorizontalAlignment="Left" VerticalAlignment="Top" TextAlignment="DetectFromContent" TextWrapping="WrapWholeWords" Text="Welcome to the Network Statistics App This app will help you keep your network usage in check All data displayed are on your device CURRENT internet connection. If you currently connected to internet with WIFI, it will show data usage for WIFI. If you currently connected to internet by mobile data/Cellular data usage will be displayed. This notice will be only displayed on first start of this application. Please select Period bellow to see device Data usage.">
+                            </TextBlock>
                             <ListBox x:Name="usageTable" Visibility="Collapsed" MaxHeight="500" MaxWidth="500" Height="400" Width="450" VerticalAlignment="Top" VerticalContentAlignment="Top"/>
                             <Image x:Name="loadingImage" VerticalAlignment="Center" Height="200" MaxHeight="300" Width="300" MaxWidth="500" HorizontalAlignment="Center" Source="Assets/loading.gif" Stretch="Fill" Visibility="Collapsed"></Image>
                         </StackPanel>
@@ -40,12 +40,12 @@
                 </StackPanel>
             </PivotItem>
             <PivotItem Header="Download Chart" x:Name="downPivot" Visibility="Collapsed">
-                <Charting:Chart x:Name="DownloadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="500" Height="400">
+                <Charting:Chart x:Name="DownloadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="500" Height="500">
                     <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="download" Title="Download Usage" IsSelectionEnabled="False"/>
                 </Charting:Chart>
             </PivotItem>
             <PivotItem Header="Upload Chart" x:Name="UpPivot" Visibility="Collapsed">
-                <Charting:Chart x:Name="UploadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="500" Height="400">
+                <Charting:Chart x:Name="UploadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="500" Height="500">
                     <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="upload" Title="Upload Usage" IsSelectionEnabled="False"/>
                 </Charting:Chart>
             </PivotItem>

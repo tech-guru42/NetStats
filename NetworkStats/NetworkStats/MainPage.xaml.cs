@@ -2,29 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Networking.Connectivity;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using WinRTXamlToolkit.Controls.DataVisualization.Charting;
-
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace NetworkStats
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     #region Chart Structures
     //Structures for Chart in WinRTXaml data
     public class Downloads
@@ -49,6 +34,7 @@ namespace NetworkStats
         public MainPage()
         {
             this.InitializeComponent();
+            //AboutBox.Text = "Welcome to the Network Statistics App \n This app will help you keep your network usage in check \n All data displayed are on your device CURRENT internet connection. \n If you currently connected to internet with WIFI, it will show data usage for WIFI. \n If you currently connected to internet by mobile data/Cellular data usage will be displayed.\n This notice will be only displayed on first start of this application.";
             //Dissable all contant in Download and Upload pivots
             downPivot.Visibility = Visibility.Collapsed;
             UpPivot.Visibility = Visibility.Collapsed;
@@ -123,7 +109,7 @@ namespace NetworkStats
             List<DateTime> period = new List<DateTime>();
             List<String> dataList = new List<string>();
             usageTable.ItemsSource = null;
-            //Gets usage data for period
+            //Gets usage data for the period of 24 hours. Total usage
             List<ulong> usageData = GetUsage(startTime, currTime);
             //Using ByteSize to convert usage data to easy to read data. Converts to MB, GB, TB ect...
             var download = ByteSize.FromBytes(usageData[0]);
@@ -144,16 +130,20 @@ namespace NetworkStats
                 period.Add(DateTime.Now.AddDays(-1).AddHours(hour + 1));
                 //Getting usage for beggining to the end of period set
                 List<ulong> data = GetUsage(period[0], period[1]);
-                //
+                //Populating list of period usages
                 dataList.Add(period[1].ToString() + " Download: " + ByteSize.FromBytes(data[0]) + " Upload: " + ByteSize.FromBytes(data[1]));
-                data[0] = data[0] / 1024;
+                //Converts bytesReceived to MegaBytes for better display in Chart and to avoid int overflow when converting from Ulong
+                data[0] = data[0] / 1024/ 1024;
+                //Converting ulong to int
                 int downTemp = unchecked((int)data[0]);
+                //Populating Record list for charts
                 downloads.Add(new Downloads()
                 {
                     Name = period[1].Hour.ToString(),
                     download = downTemp,
                 });
-                data[1] = data[1] / 1024;
+                //Converts bytesReceived to MegaBytes for better display in Chart and to avoid int overflow when converting from Ulong
+                data[1] = data[1] / 1024/ 1024;
                 int upTemp = unchecked((int)data[1]);
                 uploads.Add(new Uploads()
                 {
@@ -181,35 +171,48 @@ namespace NetworkStats
         private void weekUsage()
         {
             loadingImage.Visibility = Visibility.Visible;
+            //Set end Time to now
             var currTime = DateTime.Now;
             List<String> dataList = new List<string>();
+            List<DateTime> period = new List<DateTime>();
             usageTable.ItemsSource = null;
-            //Set start Time to 7 Days before current time
+            //Set start Time to 7 Days before current time for total usage
             var startTime = currTime - TimeSpan.FromDays(7);
-            GetUsage(startTime, currTime);
+            //Gets usage for period sets (Last 7 days) for total usage
             List<ulong> usageData = GetUsage(startTime, currTime);
+            //Using ByteSize to convert usage data to easy to read data. Converts to MB, GB, TB ect...
             var download = ByteSize.FromBytes(usageData[0]);
-            Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
             var upload = ByteSize.FromBytes(usageData[1]);
+            //Display total usage data
+            Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
+            //Display total usage data
             downloads.Clear();
             uploads.Clear();
-            List<DateTime> period = new List<DateTime>();
+            //Do 24 hour loop for getting usage data
             for (int day = 0; day < 7; day++)
             {
+                //Clears previous period data
                 period.Clear();
+                //Beggining of usage period
                 period.Add(DateTime.Now.AddDays(-7 + day));
                 period.Add(DateTime.Now.AddDays(-6 + day));
+                //Getting usage for beggining to the end of period set
                 List<ulong> data = GetUsage(period[0], period[1]);
+                //Populating list of period usages
                 dataList.Add(period[1].ToString() + " Download: " + ByteSize.FromBytes(data[0]) + " Upload: " + ByteSize.FromBytes(data[1]));
-                data[0] = data[0] / 1024;
+                //Converts bytesReceived to MegaBytes for better display in Chart and to avoid int overflow when converting from Ulong
+                data[0] = data[0] / 1024 /1024;
+                //Converting ulong to int
                 int downTemp = unchecked((int)data[0]);
+                //Populating Record list for charts
                 downloads.Add(new Downloads()
                 {
                     Name = period[1].DayOfWeek.ToString().Substring(0, 2),
                     download = downTemp,
                 });
-                data[1] = data[1] / 1024;
+                //Converts bytesReceived to MegaBytes for better display in Chart and to avoid int overflow when converting from Ulong
+                data[1] = data[1] / 1024 /1024;
                 int upTemp = unchecked((int)data[1]);
                 uploads.Add(new Uploads()
                 {
@@ -245,9 +248,11 @@ namespace NetworkStats
             var startTime = new DateTime(currTime.Year, currTime.Month, 1);
             GetUsage(startTime, currTime);
             List<ulong> usageData = GetUsage(startTime, currTime);
+            //Using ByteSize to convert usage data to easy to read data. Converts to MB, GB, TB ect...
             var download = ByteSize.FromBytes(usageData[0]);
-            Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
             var upload = ByteSize.FromBytes(usageData[1]);
+            //Display Total usage data
+            Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);            
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
             List<DateTime> period = new List<DateTime>();
             for (int day = 0; day < 30; day++)
@@ -256,15 +261,18 @@ namespace NetworkStats
                 period.Add(DateTime.Now.AddDays(-30 + day));
                 period.Add(DateTime.Now.AddDays(-29 + day));
                 List<ulong> data = GetUsage(period[0], period[1]);
+                //Populating list of period usages
                 dataList.Add(period[1].ToString() + " Download: " + ByteSize.FromBytes(data[0]) + " Upload: " + ByteSize.FromBytes(data[1]));
-                data[0] = data[0] / 1024;
+                //Converts bytesReceived to MegaBytes for better display in Chart and to avoid int overflow when converting from Ulong
+                data[0] = data[0] / 1024 /1024;
                 int downTemp = unchecked((int)data[0]);
                 downloads.Add(new Downloads()
                 {
                     Name = period[1].Day.ToString(),
                     download = downTemp,
                 });
-                data[1] = data[1] / 1024;
+                //Converts bytesReceived to MegaBytes for better display in Chart and to avoid int overflow when converting from Ulong
+                data[1] = data[1] / 1024 /1024;
                 int upTemp = unchecked((int)data[1]);
                 uploads.Add(new Uploads()
                 {
