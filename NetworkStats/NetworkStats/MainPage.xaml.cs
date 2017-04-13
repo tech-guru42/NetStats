@@ -44,8 +44,8 @@ namespace NetworkStats
         public MainPage()
         {
             this.InitializeComponent();
-            //dayChart();
-            //LoadChartContents();
+            DownloadChart.Visibility = Visibility.Collapsed;
+            UploadChart.Visibility = Visibility.Collapsed;
         }
 
         public List<ulong> GetUsage(DateTime start, DateTime end)
@@ -72,7 +72,36 @@ namespace NetworkStats
             Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
             var upload = ByteSize.FromBytes(usageData[1]);
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
-            dayChart();
+            downloads.Clear();
+            uploads.Clear();
+            List<DateTime> period = new List<DateTime>();
+            for (int hour = 0; hour < 24; hour++)
+            {
+                period.Clear();
+                period.Add(DateTime.Now.AddDays(-1).AddHours(hour));
+                period.Add(DateTime.Now.AddDays(-1).AddHours(hour + 1));
+                List<ulong> data = GetUsage(period[0], period[1]);
+                data[0] = data[0] / 1024;
+                int downTemp = unchecked((int)data[0]);
+                downloads.Add(new Downloads()
+                {
+                    Name = period[0].Hour.ToString(),
+                    download = downTemp,
+                });
+                data[1] = data[1] / 1024;
+                int upTemp = unchecked((int)data[1]);
+                uploads.Add(new Uploads()
+                {
+                    Name = period[0].Hour.ToString(),
+                    upload = unchecked(upTemp)
+                });
+            }
+            DownloadChart.Visibility = Visibility.Visible;
+            UploadChart.Visibility = Visibility.Visible;
+            (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
+            (DownloadChart.Series[0] as AreaSeries).ItemsSource = downloads;
+            (UploadChart.Series[0] as AreaSeries).ItemsSource = null;
+            (UploadChart.Series[0] as AreaSeries).ItemsSource = uploads;
         }
 
         private void week_Click(object sender, RoutedEventArgs e)
@@ -84,7 +113,7 @@ namespace NetworkStats
             List<ulong> usageData = GetUsage(startTime, currTime);
             var download = ByteSize.FromBytes(usageData[0]);
             Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
-            var upload = ByteSize.FromBytes(usageData[0]);
+            var upload = ByteSize.FromBytes(usageData[1]);
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
             #region
             downloads.Clear();
@@ -96,18 +125,23 @@ namespace NetworkStats
                 period.Add(DateTime.Now.AddDays(-7 + day));
                 period.Add(DateTime.Now.AddDays(-6 + day));
                 List<ulong> data = GetUsage(period[0], period[1]);
-
+                data[0] = data[0] / 1024;
+                int downTemp = unchecked((int)data[0]);
                 downloads.Add(new Downloads()
                 {
-                    Name = period[0].DayOfWeek.ToString(),
-                    download = unchecked((int)data[0] / 1024),
+                    Name = period[0].DayOfWeek.ToString().Substring(0,2),
+                    download = downTemp,
                 });
+                data[1] = data[1] / 1024;
+                int upTemp = unchecked((int) data[1]);
                 uploads.Add(new Uploads()
                 {
-                    Name = period[0].DayOfWeek.ToString(),
-                    upload = unchecked((int)data[1] / 1024)
+                    Name = period[0].DayOfWeek.ToString().Substring(0,2),
+                    upload = unchecked(upTemp)
                 });
             }
+            DownloadChart.Visibility = Visibility.Visible;
+            UploadChart.Visibility = Visibility.Visible;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = downloads;
             (UploadChart.Series[0] as AreaSeries).ItemsSource = null;
@@ -126,37 +160,36 @@ namespace NetworkStats
             Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
             var upload = ByteSize.FromBytes(usageData[1]);
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
-        }
-
-        private void dayChart()
-        {
-            var currTime = DateTime.Now;
-            downloads.Clear();
-            uploads.Clear();
+            #region
             List<DateTime> period = new List<DateTime>();
-
-            for (int hour = 0; hour < 24; hour++)
+            for (int day = 0; day < 7; day++)
             {
                 period.Clear();
-                period.Add(DateTime.Now.AddDays(-1).AddHours(hour));
-                period.Add(DateTime.Now.AddDays(-1).AddHours(hour+1));
-                List<ulong> data = GetUsage(period[0],period[1]);
-
+                period.Add(DateTime.Now.AddDays(-30 + day));
+                period.Add(DateTime.Now.AddDays(-29 + day));
+                List<ulong> data = GetUsage(period[0], period[1]);
+                data[0] = data[0] / 1024;
+                int downTemp = unchecked((int)data[0]);
                 downloads.Add(new Downloads()
                 {
-                    Name = period[0].Hour.ToString(),
-                    download = unchecked((int)data[0] / 1024),
+                    Name = period[0].Day.ToString(),
+                    download = downTemp,
                 });
+                data[1] = data[1] / 1024;
+                int upTemp = unchecked((int)data[1]);
                 uploads.Add(new Uploads()
                 {
-                    Name = period[0].Hour.ToString(),
-                    upload = unchecked((int)data[0] / 1024)
+                    Name = period[0].Day.ToString(),
+                    upload = unchecked(upTemp)
                 });
             }
+            DownloadChart.Visibility = Visibility.Visible;
+            UploadChart.Visibility = Visibility.Visible;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = downloads;
             (UploadChart.Series[0] as AreaSeries).ItemsSource = null;
             (UploadChart.Series[0] as AreaSeries).ItemsSource = uploads;
+            #endregion
         }
     }
 }
