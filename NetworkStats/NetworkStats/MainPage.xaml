@@ -20,8 +20,6 @@
                             </TextBox>
                             <ListBox x:Name="usageTable" Visibility="Collapsed" MaxHeight="500" MaxWidth="500" Height="400" Width="450" VerticalAlignment="Top" VerticalContentAlignment="Top"/>
                             <Image x:Name="loadingImage" VerticalAlignment="Center" Height="200" MaxHeight="300" Width="300" MaxWidth="500" HorizontalAlignment="Center" Source="Assets/loading.gif" Stretch="Fill" Visibility="Collapsed"></Image>
-                            
-                            
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
                             <TextBlock Text="Total Download for this period: "/>
@@ -41,17 +39,16 @@
                     </StackPanel>
                 </StackPanel>
             </PivotItem>
-            <PivotItem Header="Download Chart">
+            <PivotItem Header="Download Chart" x:Name="downPivot" Visibility="Collapsed">
                 <Charting:Chart x:Name="DownloadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="500" Height="400">
                     <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="download" Title="Download Usage" IsSelectionEnabled="False"/>
                 </Charting:Chart>
             </PivotItem>
-            <PivotItem Header="Upload Chart">
+            <PivotItem Header="Upload Chart" x:Name="UpPivot" Visibility="Collapsed">
                 <Charting:Chart x:Name="UploadChart" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" Width="500" Height="400">
                     <Charting:AreaSeries Margin="0,0" IndependentValuePath="Name" DependentValuePath="upload" Title="Upload Usage" IsSelectionEnabled="False"/>
                 </Charting:Chart>
             </PivotItem>
         </Pivot>
-
     </Grid>
 </Page>
