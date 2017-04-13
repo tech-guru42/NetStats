@@ -63,41 +63,49 @@ namespace NetworkStats
 
         private void day_Click(object sender, RoutedEventArgs e)
         {
+            loadingImage.Visibility = Visibility.Visible;
             //Set end Time to now
             var currTime = DateTime.Now;
             //Set start Time to 24 hours before current time
             var startTime = currTime - TimeSpan.FromHours(24);
             List<ulong> usageData =  GetUsage(startTime, currTime);
+            List<DateTime> period = new List<DateTime>();
+            List<String> dataList = new List<string>();
+            usageTable.ItemsSource = null;
             var download = ByteSize.FromBytes(usageData[0]);
             Download.Text = download.ToString("##,#", CultureInfo.InvariantCulture);
             var upload = ByteSize.FromBytes(usageData[1]);
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
             downloads.Clear();
             uploads.Clear();
-            List<DateTime> period = new List<DateTime>();
             for (int hour = 0; hour < 24; hour++)
             {
                 period.Clear();
                 period.Add(DateTime.Now.AddDays(-1).AddHours(hour));
                 period.Add(DateTime.Now.AddDays(-1).AddHours(hour + 1));
                 List<ulong> data = GetUsage(period[0], period[1]);
+                dataList.Add(period[1].ToString() + " Download: " + ByteSize.FromBytes(data[0]) + " Upload: " + ByteSize.FromBytes(data[1]));
                 data[0] = data[0] / 1024;
                 int downTemp = unchecked((int)data[0]);
                 downloads.Add(new Downloads()
                 {
-                    Name = period[0].Hour.ToString(),
+                    Name = period[1].Hour.ToString(),
                     download = downTemp,
                 });
                 data[1] = data[1] / 1024;
                 int upTemp = unchecked((int)data[1]);
                 uploads.Add(new Uploads()
                 {
-                    Name = period[0].Hour.ToString(),
+                    Name = period[1].Hour.ToString(),
                     upload = unchecked(upTemp)
                 });
             }
+            loadingImage.Visibility = Visibility.Collapsed;
             DownloadChart.Visibility = Visibility.Visible;
             UploadChart.Visibility = Visibility.Visible;
+            usageTable.ItemsSource = dataList;
+            AboutBox.Visibility = Visibility.Collapsed;
+            usageTable.Visibility = Visibility.Visible;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = downloads;
             (UploadChart.Series[0] as AreaSeries).ItemsSource = null;
@@ -106,7 +114,10 @@ namespace NetworkStats
 
         private void week_Click(object sender, RoutedEventArgs e)
         {
+            loadingImage.Visibility = Visibility.Visible;
             var currTime = DateTime.Now;
+            List<String> dataList = new List<string>();
+            usageTable.ItemsSource = null;
             //Set start Time to 7 Days before current time
             var startTime = currTime - TimeSpan.FromDays(7);
             GetUsage(startTime, currTime);
@@ -125,21 +136,26 @@ namespace NetworkStats
                 period.Add(DateTime.Now.AddDays(-7 + day));
                 period.Add(DateTime.Now.AddDays(-6 + day));
                 List<ulong> data = GetUsage(period[0], period[1]);
+                dataList.Add(period[1].ToString() + " Download: " + ByteSize.FromBytes(data[0]) + " Upload: " + ByteSize.FromBytes(data[1]));
                 data[0] = data[0] / 1024;
                 int downTemp = unchecked((int)data[0]);
                 downloads.Add(new Downloads()
                 {
-                    Name = period[0].DayOfWeek.ToString().Substring(0,2),
+                    Name = period[1].DayOfWeek.ToString().Substring(0,2),
                     download = downTemp,
                 });
                 data[1] = data[1] / 1024;
                 int upTemp = unchecked((int) data[1]);
                 uploads.Add(new Uploads()
                 {
-                    Name = period[0].DayOfWeek.ToString().Substring(0,2),
+                    Name = period[1].DayOfWeek.ToString().Substring(0,2),
                     upload = unchecked(upTemp)
                 });
             }
+            loadingImage.Visibility = Visibility.Collapsed;
+            usageTable.ItemsSource = dataList;
+            AboutBox.Visibility = Visibility.Collapsed;
+            usageTable.Visibility = Visibility.Visible;
             DownloadChart.Visibility = Visibility.Visible;
             UploadChart.Visibility = Visibility.Visible;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
@@ -151,6 +167,11 @@ namespace NetworkStats
 
         private void month_Click(object sender, RoutedEventArgs e)
         {
+            loadingImage.Visibility = Visibility.Visible;
+            List<String> dataList = new List<string>();
+            usageTable.ItemsSource = null;
+            downloads.Clear();
+            uploads.Clear();
             var currTime = DateTime.Now;
             //Set start Time to 1st of actual month
             var startTime = new DateTime(currTime.Year, currTime.Month, 1);
@@ -162,27 +183,32 @@ namespace NetworkStats
             Upload.Text = upload.ToString("##,#", CultureInfo.InvariantCulture);
             #region
             List<DateTime> period = new List<DateTime>();
-            for (int day = 0; day < 7; day++)
+            for (int day = 0; day < 30; day++)
             {
                 period.Clear();
                 period.Add(DateTime.Now.AddDays(-30 + day));
                 period.Add(DateTime.Now.AddDays(-29 + day));
                 List<ulong> data = GetUsage(period[0], period[1]);
+                dataList.Add(period[1].ToString() + " Download: " + ByteSize.FromBytes(data[0]) + " Upload: " + ByteSize.FromBytes(data[1]));
                 data[0] = data[0] / 1024;
                 int downTemp = unchecked((int)data[0]);
                 downloads.Add(new Downloads()
                 {
-                    Name = period[0].Day.ToString(),
+                    Name = period[1].Day.ToString(),
                     download = downTemp,
                 });
                 data[1] = data[1] / 1024;
                 int upTemp = unchecked((int)data[1]);
                 uploads.Add(new Uploads()
                 {
-                    Name = period[0].Day.ToString(),
+                    Name = period[1].Day.ToString(),
                     upload = unchecked(upTemp)
                 });
             }
+            usageTable.ItemsSource = dataList;
+            AboutBox.Visibility = Visibility.Collapsed;
+            usageTable.Visibility = Visibility.Visible;
+            loadingImage.Visibility = Visibility.Collapsed;
             DownloadChart.Visibility = Visibility.Visible;
             UploadChart.Visibility = Visibility.Visible;
             (DownloadChart.Series[0] as AreaSeries).ItemsSource = null;
